@@ -19,11 +19,14 @@ def analyze_brain_correlations(data: BrainDataInput) -> BrainCorrelationSummary:
         men_corr[feature] = float(men[feature].corr(men["MRI_Count"]))
         women_corr[feature] = float(women[feature].corr(women["MRI_Count"]))
 
-    # Сравниваем модуль коэффициента: отрицательная связь тоже может быть сильной.
-    strongest = max(
-        features,
-        key=lambda feature: max(abs(men_corr[feature]), abs(women_corr[feature])),
-    )
+    strongest = features[0]
+    max_correlation = -1
+    for feature in features:
+        # Знак не учитываем: ищем самую сильную связь в любой группе.
+        for correlation in [men_corr[feature], women_corr[feature]]:
+            if abs(correlation) > max_correlation:
+                max_correlation = abs(correlation)
+                strongest = feature
 
     return BrainCorrelationSummary(
         men_count=len(men),
